@@ -18,6 +18,8 @@
   color-scheme: light dark;
 
   --current-color: oklch(0.6 0.15 250);
+  --checker-light: #aaa;
+  --checker-dark: #666;
   --current-hue: 250;
   --current-ui-chroma-scale: 1;
 
@@ -79,9 +81,11 @@
   --ui-on-current: oklch(0.2 calc(0.08 * var(--current-ui-chroma-scale)) var(--current-hue));
 }
 
+/* Low-contrast checker: a pure black/white pattern leaks ~2.5 levels per channel at 99% alpha,
+   enough to see the grid on a nearly opaque colour. A #ccc/#fff pair leaks ~0.5 (below 8-bit rounding). */
 .checkerboard {
-  background-color: #fff;
-  background-image: repeating-conic-gradient(#000 0% 25%, #fff 0% 50%);
+  background-color: var(--checker-light);
+  background-image: repeating-conic-gradient(var(--checker-dark) 0% 25%, var(--checker-light) 0% 50%);
   background-size: 16px 16px;
 }
 
@@ -223,7 +227,8 @@ body {
   min-height: 100vh;
   background-color: #444;
   background-image:
-    linear-gradient(var(--current-color), var(--current-color)), repeating-conic-gradient(#000 0% 25%, #fff 0% 50%);
+    linear-gradient(var(--current-color), var(--current-color)),
+    repeating-conic-gradient(var(--checker-dark) 0% 25%, var(--checker-light) 0% 50%);
   background-size:
     100% 100%,
     64px 64px;
