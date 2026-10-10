@@ -112,7 +112,7 @@ const sortOptions: { label: string; value: PaintboxSortMode }[] = [
       >
         PDF
       </button>
-      <button type="button" onclick={onExport} class="action-button">Code</button>
+      <button type="button" onclick={onExport} class="action-button">Code...</button>
     </div>
   </div>
 
