@@ -137,9 +137,10 @@ const handleInput = (e: Event) => {
         {/if}
         <div
           class="
-                      pointer-events-none absolute bottom-full left-1/2 z-50
-                      mb-2 -translate-x-1/2 rounded-md border
-                      border-(--ui-border) bg-(--ui-card) px-3 py-2 text-xs
+                      pointer-events-none absolute top-full left-1/2 z-50
+                      mt-2 -translate-x-1/2 rounded-md border
+                      border-(--ui-border) bg-(--ui-bg) px-3 py-2 text-xs
+                      text-(--ui-text)
                       whitespace-nowrap opacity-0 shadow-xl transition-opacity
                       group-hover:opacity-100
                     "
