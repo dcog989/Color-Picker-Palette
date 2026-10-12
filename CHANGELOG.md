@@ -2,6 +2,23 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v3.8.1 - 2026-10-12
+
+#### Bug Fixes
+
+- (b71ad44) retry the analysis worker and surface failures instead of silently aborting - dcog989
+
+- (25f9f12) drop the precision toggle tooltip below the trigger so the panel doesn't clip it - dcog989
+
+- (a8ec612) honour precision toggle when copying palette swatch colors - dcog989
+
+- (86e5fbb) checkerboard magic numbers - dcog989
+
+#### Refactoring
+
+- (ed9d573) add ellipsis to code button - dcog989
+- - -
+
 ## v3.8.0 - 2026-10-10
 
 #### Features
