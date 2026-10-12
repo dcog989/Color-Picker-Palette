@@ -17,6 +17,12 @@ const gridColors = $derived.by(() => {
   return Array.from({ length: 24 }, (_, i) => colors[i] ?? null);
 });
 
+$effect(() => {
+  if (imageAnalyzer.analysisError) {
+    toast.show(imageAnalyzer.analysisError);
+  }
+});
+
 const handleFiles = async (files: FileList | null) => {
   if (files?.[0]) {
     try {

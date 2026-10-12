@@ -18,7 +18,9 @@ export class ImageStore {
   previewUrl = $state<string>("");
   currentFile = $state<File | null>(null);
 
-  #managedWorker = new ManagedWorker<ImageWorkerMessage>();
+  analysisError = $state<string | null>(null);
+
+  #managedWorker = new ManagedWorker<ImageWorkerMessage>({ maxRetries: 3, retryDelay: 1000 });
   #generation = 0;
 
   extractedPalette = $derived.by(() => {
@@ -65,6 +67,7 @@ export class ImageStore {
     this.#managedWorker.terminate();
 
     this.isProcessing = true;
+    this.analysisError = null;
     this.currentFile = file;
 
     if (this.previewUrl) {
@@ -109,6 +112,7 @@ export class ImageStore {
           onError: () => {
             if (generation !== this.#generation) return;
             this.isProcessing = false;
+            this.analysisError = "Image analysis failed. Reload the page and try again.";
           },
         },
         "Image analysis worker",
@@ -128,6 +132,7 @@ export class ImageStore {
   clear() {
     this.#generation++;
     this.isProcessing = false;
+    this.analysisError = null;
     this.mosaicData = [];
     this.currentFile = null;
     if (this.previewUrl) {
