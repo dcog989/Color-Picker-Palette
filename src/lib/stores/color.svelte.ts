@@ -178,14 +178,12 @@ export class ColorStore {
       return css;
     }
 
-    const precision = this.#precisionMode() === "precise" ? 4 : undefined;
-
     if (this.mode === "rgb") {
       return parsed.toRgbString();
     } else if (this.mode === "okhsl") {
-      return parsed.toOkhslString(precision);
+      return parsed.toOkhslString(this.#precision);
     } else {
-      return parsed.toOklchString(precision);
+      return parsed.toOklchString(this.#precisionMode() === "precise" ? 4 : 2);
     }
   }
 
