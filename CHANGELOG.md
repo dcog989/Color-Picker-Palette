@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v3.9.1 - 2026-10-15
+
+#### Bug Fixes
+
+- (b6b5d1a) show okhsl/oklch channels as decimals to match output - dcog989
+- - -
+
 ## v3.9.0 - 2026-10-15
 
 #### Features
