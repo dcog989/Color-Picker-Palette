@@ -1,6 +1,6 @@
 import { colordx, getFormat } from "@colordx/core";
 import { describe, expect, it } from "vitest";
-import { formatColor, safeColor } from "./formatters";
+import { formatColor, normalizeColorString, safeColor } from "./formatters";
 
 describe("colordx formatting", () => {
   describe("toOklchString", () => {
@@ -58,6 +58,25 @@ describe("safeColor", () => {
   it("returns null for unrecognized input", () => {
     expect(safeColor("not-a-color")).toBeNull();
     expect(safeColor("")).toBeNull();
+  });
+});
+
+describe("normalizeColorString", () => {
+  it("converts commas to spaces for space-only functions", () => {
+    expect(normalizeColorString("oklch(0.5, 0.1, 336.3)")).toBe("oklch(0.5 0.1 336.3)");
+    expect(normalizeColorString("Okhsl(104.1, 0.497, 0.556)")).toBe("Okhsl(104.1 49.7 55.6)");
+  });
+
+  it("scales okhsl/okhsv 0..1 fractions to percentages", () => {
+    expect(normalizeColorString("okhsl(336.3 0.287 0.434)")).toBe("okhsl(336.3 28.7 43.4)");
+    expect(normalizeColorString("okhsv(104.1 0.497 0.556)")).toBe("okhsv(104.1 49.7 55.6)");
+  });
+
+  it("leaves percentage values and other formats untouched", () => {
+    expect(normalizeColorString("okhsl(336.3 28.7% 43.4%)")).toBe("okhsl(336.3 28.7% 43.4%)");
+    expect(normalizeColorString("okhsl(104.1 50 56)")).toBe("okhsl(104.1 50 56)");
+    expect(normalizeColorString("rgba(255, 128, 64, 0.5)")).toBe("rgba(255, 128, 64, 0.5)");
+    expect(normalizeColorString("  #ff0000  ")).toBe("#ff0000");
   });
 });
 
