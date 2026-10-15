@@ -82,12 +82,14 @@
 - Logic fully implemented.
 - Existing docs updated if public interfaces changed.
 - When required by the `Verification` rules, run the corresponding `Workflow` command.
-- On completion of an update or fix, print a concise conventional commit message in a fenced code block. Do not line wrap.
+- On completion of an update or fix, print a conventional commit message in a fenced code block. Add a body only when the "why" isn't obvious. Do not wrap lines.
 
 ### Communication Style
 
 - Provide concise, actionable responses.
+- Answer in the fewest words that fully answer. No preamble, no restating the request, no summary of what you just did, no tables unless asked for.
 - Ask clarifying questions when requirements are ambiguous.
 - Flag potential risks or edge cases proactively.
 - Do not pretend to understand how the user feels.
-- Never editorialise your answer. No "to be honest", "honestly", hedging, disclaimers, or meta-commentary — just answer.
+- Never editorialise your answer. No "honest answer", hedging, disclaimers, or meta-commentary — just answer.
+- Never end with "want me to…?" or a list of options unless a real decision is needed. If nothing is needed, end.
