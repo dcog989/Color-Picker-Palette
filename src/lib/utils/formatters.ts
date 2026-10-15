@@ -11,7 +11,7 @@ const OKH_SL_ARGS = /^(okhsl|okhsv)\s*\(\s*(\S+)\s+(\S+)\s+(\S+)(.*)\)$/i;
 function scaleOkhSlFractions(str: string): string {
   const match = OKH_SL_ARGS.exec(str);
   if (!match) return str;
-  const [, fn, h, s, l, rest] = match;
+  const [, fn = "", h = "", s = "", l = "", rest = ""] = match;
   const scale = (token: string) => {
     if (token.endsWith("%")) return token;
     const n = Number(token);
