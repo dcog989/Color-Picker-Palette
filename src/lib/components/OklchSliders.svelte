@@ -9,7 +9,7 @@ const { color } = getApp();
 <Slider
   label="Lightness"
   bind:value={color.l}
-  displayValue={`${(color.l * 100).toFixed(color.percentDecimals)}%`}
+  displayValue={color.l.toFixed(color.channelDecimals)}
   min={0}
   max={1}
   step={color.channelStep}

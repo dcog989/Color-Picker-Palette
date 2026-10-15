@@ -45,7 +45,7 @@ const update = () => color.setOkhslValues(local.h, local.s, local.l);
 <Slider
   label="Saturation"
   bind:value={local.s}
-  displayValue={`${local.s.toFixed(color.percentDecimals)}%`}
+  displayValue={(local.s / 100).toFixed(color.channelDecimals)}
   min={0}
   max={100}
   step={color.channelStep * 100}
@@ -55,7 +55,7 @@ const update = () => color.setOkhslValues(local.h, local.s, local.l);
 <Slider
   label="Lightness"
   bind:value={local.l}
-  displayValue={`${local.l.toFixed(color.percentDecimals)}%`}
+  displayValue={(local.l / 100).toFixed(color.channelDecimals)}
   min={0}
   max={100}
   step={color.channelStep * 100}
