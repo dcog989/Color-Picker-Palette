@@ -112,9 +112,9 @@ function formatHwb(color: Colordx, precise: boolean): string {
 // colordx's toRgbString always rounds to integers, so build the string from
 // toRgb(precision) to honour the requested channel digits.
 const formatRgb = (color: Colordx, precise: boolean): string => {
+  const d = precise ? DECIMALS.precise : DECIMALS.practical;
   const { r, g, b } = color.toRgb(precise ? RGB_DECIMALS : 0);
-  const suffix = color.alpha() < 1 ? ` / ${color.alpha()}` : "";
-  return `rgb(${r} ${g} ${b}${suffix})`;
+  return joinColor("rgb", [r, g, b], color.alpha(), d.channel);
 };
 
 export class ColorStore {
