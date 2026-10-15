@@ -40,13 +40,13 @@ function getMaxSrgbChroma(l: number, h: number): number {
   return low;
 }
 
-// Decimal places per mode. Percent channels (0..100) carry two fewer places than
-// fraction channels (0..1); hue is coarser than both. Sliders reuse these as steps.
+// Decimal places per mode, keyed by channel scale. Percent (0..100) carries two
+// fewer places than fraction (0..1); hue is coarser than both; rgb is 0..255.
+// Sliders reuse these as steps.
 const DECIMALS = {
-  practical: { channel: 2, percent: 0, hue: 0 },
-  precise: { channel: 4, percent: 2, hue: 1 },
+  practical: { channel: 2, percent: 0, hue: 0, rgb: 0 },
+  precise: { channel: 4, percent: 2, hue: 1, rgb: 2 },
 } as const;
-const RGB_DECIMALS = 2;
 
 const round = (value: number, decimals: number): number => parseFloat(value.toFixed(decimals));
 
@@ -55,8 +55,6 @@ const joinColor = (fn: string, channels: (number | string)[], alpha: number, dec
   return `${fn}(${channels.join(" ")}${suffix})`;
 };
 
-// OKLCH/OKHSL/HSL channels sit on different scales, so the modes differ only in
-// digit count rather than a uniform precision pass.
 function formatOklch(color: Colordx, precise: boolean): string {
   const { l, c, h, alpha } = color.toOklch();
   const d = precise ? DECIMALS.precise : DECIMALS.practical;
@@ -113,7 +111,7 @@ function formatHwb(color: Colordx, precise: boolean): string {
 // toRgb(precision) to honour the requested channel digits.
 const formatRgb = (color: Colordx, precise: boolean): string => {
   const d = precise ? DECIMALS.precise : DECIMALS.practical;
-  const { r, g, b } = color.toRgb(precise ? RGB_DECIMALS : 0);
+  const { r, g, b } = color.toRgb(d.rgb);
   return joinColor("rgb", [r, g, b], color.alpha(), d.channel);
 };
 
@@ -268,7 +266,7 @@ export class ColorStore {
 
   display = $derived(formatOklch(this.#current, this.#precisionMode() === "precise"));
 
-  get #decimals(): { channel: number; percent: number; hue: number } {
+  get #decimals(): { channel: number; percent: number; hue: number; rgb: number } {
     return this.#precisionMode() === "precise" ? DECIMALS.precise : DECIMALS.practical;
   }
 
@@ -295,9 +293,8 @@ export class ColorStore {
     return 10 ** -this.hueDecimals;
   }
 
-  // RGB channels are 0..255, so their precision is separate from the 0..1 channels.
   get rgbDecimals(): number {
-    return this.#precisionMode() === "precise" ? RGB_DECIMALS : 0;
+    return this.#decimals.rgb;
   }
 
   get rgbStep(): number {
