@@ -2,6 +2,35 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v3.9.0 - 2026-10-15
+
+#### Features
+
+- (9fe21d4) format picker values to the active precision mode - dcog989
+
+- (5c2f48e) accept all colordx input formats in the picker - dcog989
+
+#### Bug Fixes
+
+- (f31eeae) make alpha slider honour precise mode - dcog989
+
+- (7e91be9) round rgb alpha to the active precision - dcog989
+
+- (5a52ebf) apply shared percent precision to hsv/hwb and the rest - dcog989
+
+- (4241439) avoid undefined regex groups in okhsl normalizer - dcog989
+
+- (69cf84e) normalize input field after paste when color is unchanged - dcog989
+
+- (2a69976) scale okhsl/okhsv 0..1 fraction input to percentages - dcog989
+
+- (19464f9) accept legacy comma-separated okhsl/oklch/oklab/lab/hwb input - dcog989
+
+#### Refactoring
+
+- (b77bbae) fold rgb decimals into the shared DECIMALS table - dcog989
+- - -
+
 ## v3.8.1 - 2026-10-12
 
 #### Bug Fixes
