@@ -44,6 +44,17 @@ describe("safeColor", () => {
     expect(safeColor("rgb(255 128 64)")?.toHex()).toBe("#ff8040");
   });
 
+  it("accepts comma-separated space-only functions", () => {
+    expect(safeColor("oklch(0.5, 0.1, 336.3)")?.toHex()).toBe("#864c79");
+    expect(safeColor("OKLCH(0.5, 0.1, 336.3)")?.toHex()).toBe("#864c79");
+    expect(safeColor("oklab(0.5, 0.1, -0.1)")?.toHex()).toBe("#81459a");
+  });
+
+  it("keeps legacy comma alpha syntax working", () => {
+    expect(safeColor("rgba(255, 128, 64, 0.5)")?.toHex()).toBe("#ff804080");
+    expect(safeColor("hsla(336.3, 28.7%, 43.4%, 0.5)")?.toHex()).toBe("#8e4f6880");
+  });
+
   it("returns null for unrecognized input", () => {
     expect(safeColor("not-a-color")).toBeNull();
     expect(safeColor("")).toBeNull();

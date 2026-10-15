@@ -1,5 +1,6 @@
 import type { Colordx } from "@colordx/core";
 import { colordx, inGamutSrgb, oklchToLinear } from "@colordx/core";
+import { normalizeColorString } from "../utils/formatters";
 
 const RANDOM_HUE_MAX = 360;
 const RANDOM_LIGHTNESS = 0.45;
@@ -68,7 +69,7 @@ export class ColorStore {
 
   set(value: string): boolean {
     try {
-      const parsed = colordx(value);
+      const parsed = colordx(normalizeColorString(value));
       if (!parsed.isValid()) return false;
       this.#setCurrent(parsed);
       return true;

@@ -1,9 +1,10 @@
 <script lang="ts">
-import { colordx, getFormat } from "@colordx/core";
+import { colordx } from "@colordx/core";
 import ArrowRightLeft from "@lucide/svelte/icons/arrow-right-left";
 import Check from "@lucide/svelte/icons/check";
 import X from "@lucide/svelte/icons/x";
 import { getApp } from "../context";
+import { safeColor } from "../utils/formatters";
 
 const { color } = getApp();
 
@@ -22,7 +23,7 @@ let inverted = $state<Record<ContrastMode, boolean>>({
 });
 
 const isValidColor = (colorStr: string): boolean => {
-  return getFormat(colorStr) !== undefined;
+  return safeColor(colorStr) !== null;
 };
 
 let customColorError = $derived(mode === "custom" && !isValidColor(customColor));
