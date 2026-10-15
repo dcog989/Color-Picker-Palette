@@ -187,10 +187,10 @@ const handleInput = (e: Event) => {
       <Slider
         label="Alpha"
         bind:value={color.alpha}
-        displayValue={`${(color.alpha * 100).toFixed(0)}%`}
+        displayValue={`${(color.alpha * 100).toFixed(color.percentDecimals)}%`}
         min={0}
         max={1}
-        step={0.01}
+        step={color.channelStep}
         {...getGradient("alpha", color.rgbComp)}
         showCheckerboard
       />
