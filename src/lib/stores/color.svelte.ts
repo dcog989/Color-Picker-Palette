@@ -40,11 +40,11 @@ function getMaxSrgbChroma(l: number, h: number): number {
   return low;
 }
 
-// Decimal places per mode; hue is coarser than the other channels. Sliders use the
-// same count as their step, so a drag always changes the printed value.
+// Decimal places per mode. Percent channels (0..100) carry two fewer places than
+// fraction channels (0..1); hue is coarser than both. Sliders reuse these as steps.
 const DECIMALS = {
-  practical: { channel: 2, hue: 0 },
-  precise: { channel: 4, hue: 1 },
+  practical: { channel: 2, percent: 0, hue: 0 },
+  precise: { channel: 4, percent: 2, hue: 1 },
 } as const;
 const RGB_DECIMALS = 2;
 
@@ -81,7 +81,29 @@ function formatHsl(color: Colordx, precise: boolean): string {
   const d = precise ? DECIMALS.precise : DECIMALS.practical;
   return joinColor(
     "hsl",
-    [round(h || 0, d.hue), `${round(s, d.channel)}%`, `${round(l, d.channel)}%`],
+    [round(h || 0, d.hue), `${round(s, d.percent)}%`, `${round(l, d.percent)}%`],
+    alpha,
+    d.channel,
+  );
+}
+
+function formatHsv(color: Colordx, precise: boolean): string {
+  const { h, s, v, alpha } = color.toHsv();
+  const d = precise ? DECIMALS.precise : DECIMALS.practical;
+  return joinColor(
+    "hsv",
+    [round(h || 0, d.hue), `${round(s, d.percent)}%`, `${round(v, d.percent)}%`],
+    alpha,
+    d.channel,
+  );
+}
+
+function formatHwb(color: Colordx, precise: boolean): string {
+  const { h, w, b, alpha } = color.toHwb();
+  const d = precise ? DECIMALS.precise : DECIMALS.practical;
+  return joinColor(
+    "hwb",
+    [round(h || 0, d.hue), `${round(w, d.percent)}%`, `${round(b, d.percent)}%`],
     alpha,
     d.channel,
   );
@@ -246,11 +268,7 @@ export class ColorStore {
 
   display = $derived(formatOklch(this.#current, this.#precisionMode() === "precise"));
 
-  get #precision(): number {
-    return this.#precisionMode() === "precise" ? 4 : 0;
-  }
-
-  get #decimals(): { channel: number; hue: number } {
+  get #decimals(): { channel: number; percent: number; hue: number } {
     return this.#precisionMode() === "precise" ? DECIMALS.precise : DECIMALS.practical;
   }
 
@@ -264,7 +282,7 @@ export class ColorStore {
 
   // Percent is the 0..100 form of a 0..1 channel, so it needs two fewer places.
   get percentDecimals(): number {
-    return Math.max(0, this.channelDecimals - 2);
+    return this.#decimals.percent;
   }
 
   // Slider steps must match the printed precision, or dragging changes a digit the
@@ -294,18 +312,18 @@ export class ColorStore {
 
   hsl = $derived(formatHsl(this.#displayColor, this.#precisionMode() === "precise"));
 
-  hsv = $derived(this.#displayColor.toHsvString(this.#precision));
+  hsv = $derived(formatHsv(this.#displayColor, this.#precisionMode() === "precise"));
 
-  hwb = $derived(this.#displayColor.toHwbString(this.#precision));
+  hwb = $derived(formatHwb(this.#displayColor, this.#precisionMode() === "precise"));
 
   okhsl = $derived(formatOkhsl(this.#displayColor, this.#precisionMode() === "precise"));
 
-  oklab = $derived.by(() => this.#current.toOklabString(this.#precisionMode() === "precise" ? 4 : 2));
+  oklab = $derived(this.#current.toOklabString(this.channelDecimals));
 
-  cmyk = $derived(this.#displayColor.toCmykString(this.#precision));
+  cmyk = $derived(this.#displayColor.toCmykString(this.percentDecimals));
 
-  // P3 channels are 0..1, so practical precision needs more than the whole-number default.
-  p3 = $derived(this.#current.toP3String(this.#precisionMode() === "precise" ? 4 : 3));
+  // P3 channels are 0..1, so they follow the shared channel precision.
+  p3 = $derived(this.#current.toP3String(this.channelDecimals));
 
   cssVar = $derived.by(() => {
     const oklch = this.#oklch;
