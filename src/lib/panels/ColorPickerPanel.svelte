@@ -43,9 +43,12 @@ const togglePrecision = () => {
 };
 
 const handleInput = (e: Event) => {
-  const val = (e.target as HTMLInputElement).value;
-  if (color.set(val)) {
+  const input = e.target as HTMLInputElement;
+  if (color.set(input.value)) {
     hasError = false;
+    // Repaint the field so a pasted string from another format always shows the
+    // current mode's value, even when the color itself didn't change.
+    input.value = inputVal;
   } else {
     hasError = true;
     toast.show("Invalid color format");
