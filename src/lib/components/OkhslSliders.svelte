@@ -35,30 +35,30 @@ const update = () => color.setOkhslValues(local.h, local.s, local.l);
 <Slider
   label="Hue"
   bind:value={local.h}
-  displayValue={`${local.h.toFixed(0)}°`}
+  displayValue={`${local.h.toFixed(color.hueDecimals)}°`}
   min={0}
   max={360}
-  step={1}
+  step={color.hueStep}
   {...okhslGradient("h", local)}
   oninput={update}
 />
 <Slider
   label="Saturation"
   bind:value={local.s}
-  displayValue={`${local.s.toFixed(0)}%`}
+  displayValue={`${local.s.toFixed(color.percentDecimals)}%`}
   min={0}
   max={100}
-  step={1}
+  step={color.channelStep * 100}
   {...okhslGradient("s", local)}
   oninput={update}
 />
 <Slider
   label="Lightness"
   bind:value={local.l}
-  displayValue={`${local.l.toFixed(0)}%`}
+  displayValue={`${local.l.toFixed(color.percentDecimals)}%`}
   min={0}
   max={100}
-  step={1}
+  step={color.channelStep * 100}
   {...okhslGradient("l", local)}
   oninput={update}
 />

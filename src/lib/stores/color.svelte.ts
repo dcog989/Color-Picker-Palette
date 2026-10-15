@@ -40,12 +40,67 @@ function getMaxSrgbChroma(l: number, h: number): number {
   return low;
 }
 
+// Decimal places per mode; hue is coarser than the other channels. Sliders use the
+// same count as their step, so a drag always changes the printed value.
+const DECIMALS = {
+  practical: { channel: 2, hue: 0 },
+  precise: { channel: 4, hue: 1 },
+} as const;
+const RGB_DECIMALS = 2;
+
+const round = (value: number, decimals: number): number => parseFloat(value.toFixed(decimals));
+
+const joinColor = (fn: string, channels: (number | string)[], alpha: number, decimals: number): string => {
+  const suffix = alpha < 1 ? ` / ${round(alpha, decimals)}` : "";
+  return `${fn}(${channels.join(" ")}${suffix})`;
+};
+
+// OKLCH/OKHSL/HSL channels sit on different scales, so the modes differ only in
+// digit count rather than a uniform precision pass.
+function formatOklch(color: Colordx, precise: boolean): string {
+  const { l, c, h, alpha } = color.toOklch();
+  const d = precise ? DECIMALS.precise : DECIMALS.practical;
+  return joinColor("oklch", [round(l, d.channel), round(c, d.channel), round(h || 0, d.hue)], alpha, d.channel);
+}
+
+// OKHSL/OKHSV native saturation and lightness are 0..1 fractions, but colordx
+// reports percentages; the app prints the decimal form, matching its input normalizer.
+function formatOkhsl(color: Colordx, precise: boolean): string {
+  const { h, s, l, alpha } = color.toOkhsl();
+  const d = precise ? DECIMALS.precise : DECIMALS.practical;
+  return joinColor(
+    "okhsl",
+    [round(h || 0, d.hue), round(s / 100, d.channel), round(l / 100, d.channel)],
+    alpha,
+    d.channel,
+  );
+}
+
+function formatHsl(color: Colordx, precise: boolean): string {
+  const { h, s, l, alpha } = color.toHsl();
+  const d = precise ? DECIMALS.precise : DECIMALS.practical;
+  return joinColor(
+    "hsl",
+    [round(h || 0, d.hue), `${round(s, d.channel)}%`, `${round(l, d.channel)}%`],
+    alpha,
+    d.channel,
+  );
+}
+
+// colordx's toRgbString always rounds to integers, so build the string from
+// toRgb(precision) to honour the requested channel digits.
+const formatRgb = (color: Colordx, precise: boolean): string => {
+  const { r, g, b } = color.toRgb(precise ? RGB_DECIMALS : 0);
+  const suffix = color.alpha() < 1 ? ` / ${color.alpha()}` : "";
+  return `rgb(${r} ${g} ${b}${suffix})`;
+};
+
 export class ColorStore {
   #current = $state<Colordx>(ColorStore.#getRandomColor());
   #oklch = $derived(this.#current.toOklch());
   #lastMeaningfulHue = 0;
   mode = $state<"okhsl" | "oklch" | "rgb">("okhsl");
-  #precisionMode: () => "precise" | "practical";
+  #precisionMode: () => "precise" | "practical" = () => "practical";
 
   constructor(precisionGetter: () => "precise" | "practical" = () => "practical") {
     this.#precisionMode = precisionGetter;
@@ -133,7 +188,7 @@ export class ColorStore {
 
   #displayColor = $derived.by(() => (inGamutSrgb(this.#oklch) ? this.#current : this.#current.clampSrgb()));
 
-  rgbComp = $derived(this.#displayColor.toRgb());
+  rgbComp = $derived(this.#displayColor.toRgb(this.rgbDecimals));
 
   mapToSrgb() {
     this.#setCurrent(this.#current.mapSrgb());
@@ -179,56 +234,78 @@ export class ColorStore {
       return css;
     }
 
+    const precise = this.#precisionMode() === "precise";
     if (this.mode === "rgb") {
-      return parsed.toRgbString();
+      return formatRgb(parsed, precise);
     } else if (this.mode === "okhsl") {
-      return parsed.toOkhslString(this.#precision);
+      return formatOkhsl(parsed, precise);
     } else {
-      return parsed.toOklchString(this.#precisionMode() === "precise" ? 4 : 2);
+      return formatOklch(parsed, precise);
     }
   }
 
-  display = $derived.by(() => {
-    if (this.#precisionMode() === "precise") {
-      return this.#current.toOklchString();
-    }
-    const { l, c, h, alpha } = this.#oklch;
-    const lPct = Math.round(l * 100);
-    const cStr = parseFloat(c.toFixed(2));
-    const hStr = Math.round(h || 0);
-    return alpha < 1
-      ? `oklch(${lPct}% ${cStr} ${hStr} / ${parseFloat(alpha.toFixed(1))})`
-      : `oklch(${lPct}% ${cStr} ${hStr})`;
-  });
+  display = $derived(formatOklch(this.#current, this.#precisionMode() === "precise"));
 
   get #precision(): number {
     return this.#precisionMode() === "precise" ? 4 : 0;
+  }
+
+  get #decimals(): { channel: number; hue: number } {
+    return this.#precisionMode() === "precise" ? DECIMALS.precise : DECIMALS.practical;
+  }
+
+  get channelDecimals(): number {
+    return this.#decimals.channel;
+  }
+
+  get hueDecimals(): number {
+    return this.#decimals.hue;
+  }
+
+  // Percent is the 0..100 form of a 0..1 channel, so it needs two fewer places.
+  get percentDecimals(): number {
+    return Math.max(0, this.channelDecimals - 2);
+  }
+
+  // Slider steps must match the printed precision, or dragging changes a digit the
+  // readout hides. The step is on the 0..1 scale; okhsl sliders multiply by 100.
+  get channelStep(): number {
+    return 10 ** -this.channelDecimals;
+  }
+
+  get hueStep(): number {
+    return 10 ** -this.hueDecimals;
+  }
+
+  // RGB channels are 0..255, so their precision is separate from the 0..1 channels.
+  get rgbDecimals(): number {
+    return this.#precisionMode() === "precise" ? RGB_DECIMALS : 0;
+  }
+
+  get rgbStep(): number {
+    return 10 ** -this.rgbDecimals;
   }
 
   hex = $derived(this.#displayColor.alpha(1).toHex());
 
   hexa = $derived(this.#displayColor.toHex());
 
-  rgb = $derived.by(() => {
-    const p = this.#precision;
-    if (!p) {
-      return this.#displayColor.toRgbString();
-    }
-    const { r, g, b, alpha } = this.#displayColor.toRgb(p);
-    return alpha < 1 ? `rgb(${r} ${g} ${b} / ${alpha})` : `rgb(${r} ${g} ${b})`;
-  });
+  rgb = $derived(formatRgb(this.#displayColor, this.#precisionMode() === "precise"));
 
-  hsl = $derived(this.#displayColor.toHslString(this.#precision));
+  hsl = $derived(formatHsl(this.#displayColor, this.#precisionMode() === "precise"));
+
+  hsv = $derived(this.#displayColor.toHsvString(this.#precision));
 
   hwb = $derived(this.#displayColor.toHwbString(this.#precision));
 
-  okhsl = $derived(this.#displayColor.toOkhslString(this.#precision));
-
-  lab = $derived(this.#current.toLabString(this.#precision));
+  okhsl = $derived(formatOkhsl(this.#displayColor, this.#precisionMode() === "precise"));
 
   oklab = $derived.by(() => this.#current.toOklabString(this.#precisionMode() === "precise" ? 4 : 2));
 
   cmyk = $derived(this.#displayColor.toCmykString(this.#precision));
+
+  // P3 channels are 0..1, so practical precision needs more than the whole-number default.
+  p3 = $derived(this.#current.toP3String(this.#precisionMode() === "precise" ? 4 : 3));
 
   cssVar = $derived.by(() => {
     const oklch = this.#oklch;

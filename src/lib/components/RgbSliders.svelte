@@ -20,30 +20,30 @@ const updateRgbFromLocal = () => color.setRgbValues(localRgb.r, localRgb.g, loca
 <Slider
   label="Red"
   bind:value={localRgb.r}
-  displayValue={String(localRgb.r)}
+  displayValue={localRgb.r.toFixed(color.rgbDecimals)}
   min={0}
   max={255}
-  step={1}
+  step={color.rgbStep}
   {...getGradient("r", color.rgbComp)}
   oninput={updateRgbFromLocal}
 />
 <Slider
   label="Green"
   bind:value={localRgb.g}
-  displayValue={String(localRgb.g)}
+  displayValue={localRgb.g.toFixed(color.rgbDecimals)}
   min={0}
   max={255}
-  step={1}
+  step={color.rgbStep}
   {...getGradient("g", color.rgbComp)}
   oninput={updateRgbFromLocal}
 />
 <Slider
   label="Blue"
   bind:value={localRgb.b}
-  displayValue={String(localRgb.b)}
+  displayValue={localRgb.b.toFixed(color.rgbDecimals)}
   min={0}
   max={255}
-  step={1}
+  step={color.rgbStep}
   {...getGradient("b", color.rgbComp)}
   oninput={updateRgbFromLocal}
 />

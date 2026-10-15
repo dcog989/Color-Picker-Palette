@@ -9,27 +9,27 @@ const { color } = getApp();
 <Slider
   label="Lightness"
   bind:value={color.l}
-  displayValue={`${(color.l * 100).toFixed(0)}%`}
+  displayValue={`${(color.l * 100).toFixed(color.percentDecimals)}%`}
   min={0}
   max={1}
-  step={0.01}
+  step={color.channelStep}
   {...getGradient("l", color.rgbComp)}
 />
 <Slider
   label="Chroma"
   bind:value={color.c}
-  displayValue={color.c.toFixed(3)}
+  displayValue={color.c.toFixed(color.channelDecimals)}
   min={0}
   max={color.chromaMax}
-  step={0.001}
+  step={color.channelStep}
   {...getGradient("c", color.rgbComp)}
 />
 <Slider
   label="Hue"
   bind:value={color.h}
-  displayValue={`${color.h.toFixed(0)}°`}
+  displayValue={`${color.h.toFixed(color.hueDecimals)}°`}
   min={0}
   max={360}
-  step={0.1}
+  step={color.hueStep}
   {...getGradient("h", color.rgbComp)}
 />

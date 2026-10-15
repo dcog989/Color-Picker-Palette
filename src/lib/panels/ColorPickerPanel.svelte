@@ -241,13 +241,14 @@ const handleInput = (e: Event) => {
   <div class="flex flex-wrap gap-2 border-t border-(--ui-border) pt-4">
     {#each [
       { label: "HEX", value: color.hexa },
-      { label: "HSL", value: color.hsl },
-      { label: "HWB", value: color.hwb },
       { label: "RGB", value: color.rgb },
+      { label: "HSL", value: color.hsl },
+      { label: "HSV", value: color.hsv },
+      { label: "HWB", value: color.hwb },
       { label: "Oklch", value: color.display },
-      { label: "Okhsl", value: color.okhsl },
-      { label: "CIELAB", value: color.lab },
       { label: "Oklab", value: color.oklab },
+      { label: "Okhsl", value: color.okhsl },
+      { label: "P3", value: color.p3 },
       { label: "CMYK", value: color.cmyk },
     ] as format (format.label)}
       <button
