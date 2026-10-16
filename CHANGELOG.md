@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v3.9.2 - 2026-10-16
+
+#### Bug Fixes
+
+- (ab262b5) show APCA score in every mode tab - dcog989
+- - -
+
 ## v3.9.1 - 2026-10-15
 
 #### Bug Fixes
