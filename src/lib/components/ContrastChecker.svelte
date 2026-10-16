@@ -49,14 +49,19 @@ const toggleInvert = (m: ContrastMode) => {
   inverted[m] = !inverted[m];
 };
 
-let currentApca = $derived.by((): number => {
-  if (mode === "custom" && !isValidColor(customColor)) return 0;
+const apcaFor = (m: ContrastMode): number => {
+  if (m === "custom" && !isValidColor(customColor)) return 0;
+  const target = getTargetColor(m);
+  const foreground = inverted[m] ? target : color.hex;
+  const background = inverted[m] ? color.hex : target;
   try {
-    return Math.round(Math.abs(colordx(fg).apcaContrast(bg)));
+    return Math.round(Math.abs(colordx(foreground).apcaContrast(background)));
   } catch {
     return 0;
   }
-});
+};
+
+let currentApca = $derived(apcaFor(mode));
 
 let currentWcag = $derived.by((): number => {
   if (mode === "custom" && !isValidColor(customColor)) return 0;
@@ -107,17 +112,15 @@ const getApcaRating = (score: number) => {
           class="tab-button relative flex h-full w-full flex-col items-center gap-1 px-2 py-3"
         >
           <span class="section-heading">{m}</span>
-          {#if mode === m}
-            <div class="flex items-baseline gap-1">
-              {#if m === "custom" && !isValidColor(customColor)}
-                <span class="text-lg font-black text-red-500">--</span>
-                <span class="font-mono text-xs text-red-500/70">!</span>
-              {:else}
-                <span class="text-lg font-black">{currentApca}</span>
-                <span class="font-mono text-xs opacity-50">Lc</span>
-              {/if}
-            </div>
-          {/if}
+          <div class="flex items-baseline gap-1">
+            {#if m === "custom" && !isValidColor(customColor)}
+              <span class="text-lg font-black text-red-500">--</span>
+              <span class="font-mono text-xs text-red-500/70">!</span>
+            {:else}
+              <span class="text-lg font-black">{apcaFor(m)}</span>
+              <span class="font-mono text-xs opacity-50">Lc</span>
+            {/if}
+          </div>
           <!-- Active Indicator -->
           {#if mode === m}
             <div
