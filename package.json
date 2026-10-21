@@ -23,12 +23,12 @@
   },
   "dependencies": {
     "@colordx/core": "^7.3.0",
-    "@lucide/svelte": "^1.58.0",
-    "color-name-list": "^14.57.0",
+    "@lucide/svelte": "^1.61.0",
+    "color-name-list": "^14.72.0",
     "jspdf": "^4.2.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.15",
+    "@biomejs/biome": "^2.6.2",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@tailwindcss/node": "^4.3.3",
     "@tailwindcss/vite": "^4.3.3",
@@ -43,7 +43,7 @@
     "svelte-check": "^4.7.7",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.3",
-    "vite": "^8.3.4",
+    "vite": "^8.3.5",
     "vitest": "^5.0.5"
   },
   "overrides": {
