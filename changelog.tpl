@@ -1,4 +1,4 @@
-## {{ version.tag }} - {{ date | truncate(length=10, end="") }}{%- set wanted = ["Features", "Bug Fixes", "Performance Improvements", "Refactoring"] -%}
+## {{ version.tag }} - {{ date | truncate(length=10, end="") }}{%- set wanted = ["Features", "Bug Fixes", "Performance Improvements", "Refactoring", "Documentation", "Build system", "Continuous Integration", "Tests", "Style", "Miscellaneous Chores", "Revert"] -%}
 {%- for title in wanted -%}
 {%- set group = commits | filter(attribute="type", value=title) -%}
 {%- if group | length > 0 %}
