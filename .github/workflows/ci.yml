@@ -53,8 +53,10 @@ jobs:
       - name: Install frontend dependencies
         run: bun install
 
+      # deepmerge is pinned by @sveltejs/vite-plugin-svelte and 4.3.1 is the last
+      # release; the advisory covers every published version, so no fix exists.
       - name: Audit dependencies
-        run: bun audit
+        run: bun audit --ignore=GHSA-gcqx-w48m-w2h4
 
       - name: Check frontend format & lint
         run: bunx biome check .
