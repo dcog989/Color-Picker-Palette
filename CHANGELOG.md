@@ -2,6 +2,57 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v3.9.4 - 2026-11-01
+
+#### Bug Fixes
+
+- (c244bee) load the plugins each module needs - dcog989
+
+- (235b1cd) batch URL writes and lock the page behind dialogs - dcog989
+
+- (2b2430a) make modals real dialogs and stop nesting buttons - dcog989
+
+- (4a108a2) stop retrying one-shot analysis jobs - dcog989
+
+- (25a4f0c) avoid the pending name and reserve space for the PNG title - dcog989
+
+- (f0a06ff) verify imports, dedupe by color and keep the newest colors - dcog989
+
+- (045b818) measure the normalized custom color - dcog989
+
+- (6eb5b02) keep the virtual list aligned and reset scroll on search - dcog989
+
+- (137cd34) replace hsl() fills with hex so Qt-based thumbnails show colors - dcog989
+
+#### Refactoring
+
+- (39f66b6) move palette ordering into a tested helper - dcog989
+
+- (e4f9897) drop PDF export and jspdf - dcog989
+
+#### Documentation
+
+- (3ab5150) correct and complete the readme and agent directives - dcog989
+
+#### Continuous Integration
+
+- (db86e55) ignore unfixable deepmerge advisory in bun audit - dcog989
+
+#### Miscellaneous Chores
+
+- (ec94d71) cover the paintbox helpers and gate all logic files - dcog989
+
+- (44668dd) prune dead code and cover the extracted clustering logic - dcog989
+
+- (37e0db9) package updates - dcog989
+
+- (81ba7a1) add .directory to root - dcog989
+
+- (a0c4c61) attach changelog asset and list every commit type in release notes - dcog989
+
+- (055157e) bump taiki-e/install-action from 2.87.29 to 2.87.31 - dependabot[bot]
+- - -
+
 ## v3.9.3 - 2026-10-21
 - - -
 
