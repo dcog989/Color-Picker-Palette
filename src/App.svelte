@@ -32,6 +32,20 @@ let activeInfo = $state<{ title: string; content: string } | null>(null);
 // Initialize logic
 app.init();
 
+const modalOpen = $derived(showSearch || showExport || activeInfo !== null);
+
+const openSearch = () => {
+  showExport = false;
+  activeInfo = null;
+  showSearch = true;
+};
+
+const openExport = () => {
+  showSearch = false;
+  activeInfo = null;
+  showExport = true;
+};
+
 // URL hash color sync — load color from hash, mirror current color to hash.
 // sessionStorage persists across reloads (same tab) but not new tabs, so an
 // F5 refresh gets a fresh random color while opening a shared link still loads it.
@@ -49,14 +63,6 @@ const applyHashColor = () => {
 };
 applyHashColor();
 
-$effect(() => {
-  const hash = color.hexa;
-  if (location.hash !== hash) {
-    history.replaceState(null, "", hash);
-    sessionStorage.setItem(URL_COLOR_KEY, hash);
-  }
-});
-
 // Cleanup
 onDestroy(() => {
   app.destroy();
@@ -72,6 +78,7 @@ $effect(() => {
   const cssVar = color.cssVar;
   const hStr = color.h.toString();
   const c = color.c;
+  const hash = color.hexa;
 
   // Cancel pending update
   if (rafId !== null) {
@@ -98,6 +105,12 @@ $effect(() => {
     const needsDarkText = usesDarkText(cssVar);
     root.setAttribute("data-color-contrast", needsDarkText ? "dark" : "light");
 
+    // Mirror the color to the URL at most once per frame, not once per input event.
+    if (location.hash !== hash) {
+      history.replaceState(null, "", hash);
+      sessionStorage.setItem(URL_COLOR_KEY, hash);
+    }
+
     rafId = null;
   });
 
@@ -109,10 +122,18 @@ $effect(() => {
   };
 });
 
+// Lock background scrolling while a dialog is open.
+$effect(() => {
+  document.body.style.overflow = modalOpen ? "hidden" : "";
+  return () => {
+    document.body.style.overflow = "";
+  };
+});
+
 const handleKeyboard = (e: KeyboardEvent) => {
   if ((e.metaKey || e.ctrlKey) && e.key === "k") {
     e.preventDefault();
-    showSearch = true;
+    openSearch();
   }
   if ((e.metaKey || e.ctrlKey) && e.key === "s") {
     e.preventDefault();
@@ -124,9 +145,9 @@ const handleKeyboard = (e: KeyboardEvent) => {
     color.randomize();
   }
   if (e.key === "Escape") {
-    showSearch = false;
-    showExport = false;
-    activeInfo = null;
+    if (showSearch) showSearch = false;
+    else if (showExport) showExport = false;
+    else activeInfo = null;
   }
 };
 
@@ -155,6 +176,8 @@ const infoContent = {
 };
 
 const showInfo = (key: keyof typeof infoContent) => {
+  showSearch = false;
+  showExport = false;
   activeInfo = infoContent[key];
 };
 </script>
@@ -166,8 +189,9 @@ const showInfo = (key: keyof typeof infoContent) => {
       flex min-h-screen flex-col pb-20 font-sans antialiased transition-colors
       duration-500
     "
+  inert={modalOpen}
 >
-  <Header onSearch={() => (showSearch = true)} />
+  <Header onSearch={openSearch} />
 
   <main
     class="
@@ -190,7 +214,7 @@ const showInfo = (key: keyof typeof infoContent) => {
       </div>
 
       <div class="min-h-0 min-w-0 w-full max-w-[500px] max-h-[48rem]">
-        <PaintboxPanel onExport={() => (showExport = true)} />
+        <PaintboxPanel onExport={openExport} />
       </div>
     </div>
 
@@ -243,18 +267,18 @@ const showInfo = (key: keyof typeof infoContent) => {
       <Keyboard class="size-5" />
     </button>
   </footer>
-
-  {#if showSearch}
-    <SearchModal onClose={() => (showSearch = false)} />
-  {/if}
-
-  {#if showExport}
-    <ExportModal onClose={() => (showExport = false)} />
-  {/if}
-
-  {#if activeInfo}
-    <InfoModal title={activeInfo.title} content={activeInfo.content} onClose={() => (activeInfo = null)} />
-  {/if}
-
-  <Toast />
 </div>
+
+{#if showSearch}
+  <SearchModal onClose={() => (showSearch = false)} />
+{/if}
+
+{#if showExport}
+  <ExportModal onClose={() => (showExport = false)} />
+{/if}
+
+{#if activeInfo}
+  <InfoModal title={activeInfo.title} content={activeInfo.content} onClose={() => (activeInfo = null)} />
+{/if}
+
+<Toast />
