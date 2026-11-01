@@ -140,70 +140,7 @@ ${swatches}
   }
 }
 
-class PdfExportStrategy implements VisualExportStrategy {
-  name = "PDF";
-  extension = "pdf";
-  mimeType = "application/pdf";
-
-  async render(source: ColorSource, _root: RootStore): Promise<Blob> {
-    const { colors } = source;
-    const { jsPDF } = await import("jspdf");
-
-    const doc = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
-    const pageWidth = 210;
-    const margin = 20;
-    const contentWidth = pageWidth - margin * 2;
-
-    doc.setFontSize(24);
-    doc.setFont("helvetica", "bold");
-    doc.text("COLOR PALETTE", margin, 30);
-
-    const cols = 4;
-    const gap = 5;
-    const swatchWidth = (contentWidth - (cols - 1) * gap) / cols;
-    const swatchHeight = swatchWidth;
-
-    let x = margin;
-    let y = 45;
-
-    colors.forEach((item, i) => {
-      if (y + swatchHeight + 20 > 280) {
-        doc.addPage();
-        y = 30;
-      }
-
-      const parsed = safeColor(item.css);
-      if (parsed) {
-        const hex = parsed.toHex();
-
-        doc.setFillColor(hex);
-        doc.rect(x, y, swatchWidth, swatchHeight, "F");
-
-        doc.setFontSize(12);
-        doc.setTextColor(0);
-        doc.setFont("courier", "bold");
-        doc.text(hex.toUpperCase(), x, y + swatchHeight + 5);
-
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(100);
-        doc.text(parsed.toOklchString(), x, y + swatchHeight + 10);
-      }
-
-      if ((i + 1) % cols === 0) {
-        x = margin;
-        y += swatchHeight + 25;
-      } else {
-        x += swatchWidth + gap;
-      }
-    });
-
-    return doc.output("blob");
-  }
-}
-
 export const visualStrategies: Record<string, VisualExportStrategy> = {
   png: new PngExportStrategy(),
   svg: new SvgExportStrategy(),
-  pdf: new PdfExportStrategy(),
 };

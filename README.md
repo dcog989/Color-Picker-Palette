@@ -10,7 +10,7 @@ A color picker with palette, image analyser, contrast checker, and export format
 - **Palette Engine:** Generate harmonies (split-complementary, triadic) and variable scales.
 - **Image Analysis:** Extract dominant and vibrant palettes using local K-Means clustering.
 - **Accessibility:** Real-time APCA (Lc) and WCAG 2.1 contrast checking.
-- **Smart Paintbox:** Persistent storage with multi-format export (Tailwind, CSS, SVG, PDF).
+- **Smart Paintbox:** Persistent storage with multi-format export (Tailwind, CSS, SVG).
 - **Library:** Search 30,000+ named colors.
 
 ## Tech Stack

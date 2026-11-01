@@ -1,7 +1,7 @@
 <script lang="ts">
 import CircleX from "@lucide/svelte/icons/circle-x";
 import PaintboxGrid from "../components/PaintboxGrid.svelte";
-import { PALETTE_FILE } from "../constants";
+import { PAINTBOX, PALETTE_FILE } from "../constants";
 import { getApp } from "../context";
 import type { PaintboxSortMode } from "../stores/paintbox.svelte";
 import { parsePaletteFile } from "../utils/import-strategies";
@@ -17,7 +17,7 @@ const app = getApp();
 const { paintbox, toast } = app;
 
 let fileInput = $state<HTMLInputElement | null>(null);
-let exporting = $state<"png" | "svg" | "pdf" | null>(null);
+let exporting = $state<"png" | "svg" | null>(null);
 
 const handleImport = async (e: Event) => {
   const input = e.target as HTMLInputElement;
@@ -36,10 +36,10 @@ const handleImport = async (e: Event) => {
       paintbox.add(css);
     });
     const noun = colors.length === 1 ? "color" : "colors";
-    const capped = colors.length > paintbox.items.length;
+    const capped = paintbox.items.length === PAINTBOX.MAX_COLORS;
     toast.show(
       capped
-        ? `Imported ${colors.length} ${noun}; paintbox keeps the newest ${paintbox.items.length}`
+        ? `Imported ${colors.length} ${noun}; paintbox keeps the newest ${PAINTBOX.MAX_COLORS}`
         : `Imported ${colors.length} ${noun}`,
     );
   } catch (err) {
@@ -47,7 +47,7 @@ const handleImport = async (e: Event) => {
   }
 };
 
-const runVisualExport = async (kind: "png" | "svg" | "pdf") => {
+const runVisualExport = async (kind: "png" | "svg") => {
   exporting = kind;
   try {
     await exportVisual(app, kind);
@@ -116,15 +116,12 @@ const sortOptions: { label: string; value: PaintboxSortMode }[] = [
   <!-- Export Options -->
   <div class="mt-8 space-y-3">
     <h3 class="section-heading">Export</h3>
-    <div class="grid grid-cols-4 gap-3">
+    <div class="grid grid-cols-3 gap-3">
       <button type="button" onclick={() => runVisualExport("png")} disabled={exporting !== null} class="action-button">
         {exporting === "png" ? "..." : "PNG"}
       </button>
       <button type="button" onclick={() => runVisualExport("svg")} disabled={exporting !== null} class="action-button">
         {exporting === "svg" ? "..." : "SVG"}
-      </button>
-      <button type="button" onclick={() => runVisualExport("pdf")} disabled={exporting !== null} class="action-button">
-        {exporting === "pdf" ? "..." : "PDF"}
       </button>
       <button type="button" onclick={onExport} class="action-button">Code...</button>
     </div>

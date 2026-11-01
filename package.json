@@ -24,8 +24,7 @@
   "dependencies": {
     "@colordx/core": "^7.3.0",
     "@lucide/svelte": "^1.66.0",
-    "color-name-list": "^14.85.1",
-    "jspdf": "^4.2.1"
+    "color-name-list": "^14.85.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.4",
