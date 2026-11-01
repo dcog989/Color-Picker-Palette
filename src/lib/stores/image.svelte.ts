@@ -1,17 +1,17 @@
-import { colordx } from "@colordx/core";
 import { IMAGE_ANALYSIS } from "../constants";
+import { orderPalette, type PaletteEntry, type PaletteSortMode } from "../utils/image-palette";
 import { validateImageFile } from "../utils/validate-image";
 import { ManagedWorker } from "../utils/worker-manager";
 import ColorAnalysisWorker from "../workers/color-analysis.ts?worker";
 
-export type SortMode = "dominant" | "vibrant" | "bright" | "dark";
+export type SortMode = PaletteSortMode;
 
 type ImageWorkerMessage = {
   clusters: { color: string; pixels: number }[];
 };
 
 export class ImageStore {
-  mosaicData = $state<{ color: string; pixels: number }[]>([]);
+  mosaicData = $state<PaletteEntry[]>([]);
 
   sortMode = $state<SortMode>("dominant");
   isProcessing = $state(false);
@@ -23,41 +23,7 @@ export class ImageStore {
   #managedWorker = new ManagedWorker<ImageWorkerMessage>();
   #generation = 0;
 
-  extractedPalette = $derived.by(() => {
-    if (!this.mosaicData.length) return [];
-
-    const needsColor = this.sortMode !== "dominant";
-    const candidates = this.mosaicData.map((item) => {
-      let l = 0;
-      let c = 0;
-      if (needsColor) {
-        const parsed = colordx(item.color);
-        if (parsed.isValid()) {
-          const oklch = parsed.toOklch();
-          l = oklch.l;
-          c = oklch.c;
-        }
-      }
-      return { color: item.color, pixels: item.pixels, l, c };
-    });
-
-    switch (this.sortMode) {
-      case "vibrant":
-        candidates.sort((a, b) => b.c - a.c);
-        break;
-      case "bright":
-        candidates.sort((a, b) => b.l - a.l);
-        break;
-      case "dark":
-        candidates.sort((a, b) => a.l - b.l);
-        break;
-      default:
-        candidates.sort((a, b) => b.pixels - a.pixels);
-        break;
-    }
-
-    return candidates.slice(0, 24).map((c) => c.color);
-  });
+  extractedPalette = $derived(orderPalette(this.mosaicData, this.sortMode));
 
   async analyze(file: File) {
     validateImageFile(file);
