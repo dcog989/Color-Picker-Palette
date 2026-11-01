@@ -17,6 +17,7 @@ const app = getApp();
 const { paintbox, toast } = app;
 
 let fileInput = $state<HTMLInputElement | null>(null);
+let exporting = $state<"png" | "svg" | "pdf" | null>(null);
 
 const handleImport = async (e: Event) => {
   const input = e.target as HTMLInputElement;
@@ -24,14 +25,36 @@ const handleImport = async (e: Event) => {
   input.value = "";
   if (!file) return;
 
+  if (file.size > PALETTE_FILE.MAX_SIZE) {
+    toast.show(`Palette file too large (max ${PALETTE_FILE.MAX_SIZE / (1024 * 1024)}MB)`);
+    return;
+  }
+
   try {
     const colors = parsePaletteFile(file.name, await file.text());
     colors.forEach((css) => {
       paintbox.add(css);
     });
-    toast.show(`Imported ${colors.length} color${colors.length === 1 ? "" : "s"}`);
+    const noun = colors.length === 1 ? "color" : "colors";
+    const capped = colors.length > paintbox.items.length;
+    toast.show(
+      capped
+        ? `Imported ${colors.length} ${noun}; paintbox keeps the newest ${paintbox.items.length}`
+        : `Imported ${colors.length} ${noun}`,
+    );
   } catch (err) {
     toast.show(err instanceof Error ? err.message : "Failed to import palette");
+  }
+};
+
+const runVisualExport = async (kind: "png" | "svg" | "pdf") => {
+  exporting = kind;
+  try {
+    await exportVisual(app, kind);
+  } catch (err) {
+    toast.show(err instanceof Error ? err.message : "Export failed");
+  } finally {
+    exporting = null;
   }
 };
 
@@ -94,23 +117,14 @@ const sortOptions: { label: string; value: PaintboxSortMode }[] = [
   <div class="mt-8 space-y-3">
     <h3 class="section-heading">Export</h3>
     <div class="grid grid-cols-4 gap-3">
-      <button type="button" onclick={() => exportVisual(app, "png")} class="action-button">PNG</button>
-      <button type="button" onclick={() => exportVisual(app, "svg")} class="action-button">SVG</button>
-      <button
-        type="button"
-        onclick={async () => {
-          const btn = document.activeElement as HTMLButtonElement;
-          const originalText = btn?.textContent ?? "PDF";
-          if (btn) btn.textContent = "...";
-          try {
-            await exportVisual(app, "pdf");
-          } finally {
-            if (btn) btn.textContent = originalText;
-          }
-        }}
-        class="action-button"
-      >
-        PDF
+      <button type="button" onclick={() => runVisualExport("png")} disabled={exporting !== null} class="action-button">
+        {exporting === "png" ? "..." : "PNG"}
+      </button>
+      <button type="button" onclick={() => runVisualExport("svg")} disabled={exporting !== null} class="action-button">
+        {exporting === "svg" ? "..." : "SVG"}
+      </button>
+      <button type="button" onclick={() => runVisualExport("pdf")} disabled={exporting !== null} class="action-button">
+        {exporting === "pdf" ? "..." : "PDF"}
       </button>
       <button type="button" onclick={onExport} class="action-button">Code...</button>
     </div>
