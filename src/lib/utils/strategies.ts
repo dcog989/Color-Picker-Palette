@@ -9,7 +9,7 @@ export interface ColorSource {
 
 const PENDING_COLOR_NAME = "Searching...";
 
-const resolveClosestName = (closestName: string, hex: string): string => {
+export const resolveClosestName = (closestName: string, hex: string): string => {
   const trimmed = closestName.trim();
   return trimmed && trimmed !== PENDING_COLOR_NAME ? trimmed : hex;
 };

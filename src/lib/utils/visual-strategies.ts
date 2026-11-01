@@ -1,7 +1,7 @@
 import { EXPORT } from "../constants";
 import type { RootStore } from "../stores/root.svelte";
 import { safeColor } from "./formatters";
-import type { ColorSource, VisualExportStrategy } from "./strategies";
+import { type ColorSource, resolveClosestName, type VisualExportStrategy } from "./strategies";
 
 class PngExportStrategy implements VisualExportStrategy {
   name = "PNG";
@@ -25,7 +25,7 @@ class PngExportStrategy implements VisualExportStrategy {
       const textColor = root.color.l > 0.5 ? "#000000" : "#ffffff";
       ctx.fillStyle = textColor;
       ctx.font = "bold 80px system-ui, -apple-system, sans-serif";
-      ctx.fillText(root.engine.closestName.toUpperCase(), 60, 150);
+      ctx.fillText(resolveClosestName(root.engine.closestName, root.color.hex).toUpperCase(), 60, 150);
       ctx.font = "40px ui-monospace, monospace";
       ctx.fillText(root.color.display, 60, 230);
       ctx.fillText(`HEX: ${root.color.hex.toUpperCase()}`, 60, 290);
@@ -34,10 +34,11 @@ class PngExportStrategy implements VisualExportStrategy {
         ctx.fillText(`Alpha: ${(root.color.alpha * 100).toFixed(0)}%`, 60, 410);
       }
     } else {
+      const titleHeight = 60;
       const cols = Math.min(colors.length, 6);
       const rows = Math.ceil(colors.length / cols);
       const swatchWidth = EXPORT.PNG_WIDTH / cols;
-      const swatchHeight = EXPORT.PNG_HEIGHT / rows;
+      const swatchHeight = (EXPORT.PNG_HEIGHT - titleHeight) / rows;
 
       colors.forEach((item, i) => {
         const col = i % cols;
@@ -61,7 +62,6 @@ class PngExportStrategy implements VisualExportStrategy {
         }
       });
 
-      const titleHeight = 60;
       ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
       ctx.fillRect(0, EXPORT.PNG_HEIGHT - titleHeight, EXPORT.PNG_WIDTH, titleHeight);
       ctx.fillStyle = "#ffffff";
@@ -94,7 +94,7 @@ class SvgExportStrategy implements VisualExportStrategy {
       svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${EXPORT.SVG_SIZE}" height="${EXPORT.SVG_SIZE}" viewBox="0 0 ${EXPORT.SVG_SIZE} ${EXPORT.SVG_SIZE}" xmlns="http://www.w3.org/2000/svg">
   <rect width="${EXPORT.SVG_SIZE}" height="${EXPORT.SVG_SIZE}" fill="${root.color.hex}" />
-  <text x="20" y="40" font-family="sans-serif" font-weight="bold" font-size="24" fill="${textFill}">${root.engine.closestName.toUpperCase()}</text>
+  <text x="20" y="40" font-family="sans-serif" font-weight="bold" font-size="24" fill="${textFill}">${resolveClosestName(root.engine.closestName, root.color.hex).toUpperCase()}</text>
   <text x="20" y="70" font-family="monospace" font-size="14" fill="${textFill}">${root.color.display}</text>
   ${root.color.alpha < 1 ? `<text x="20" y="90" font-family="monospace" font-size="12" fill="${textFill}">Alpha: ${(root.color.alpha * 100).toFixed(0)}%</text>` : ""}
 </svg>`;
