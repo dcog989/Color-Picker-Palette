@@ -1,5 +1,6 @@
 ﻿import { colordx } from "@colordx/core";
 import { PAINTBOX } from "../constants";
+import { newestHalf, toColorKey } from "../utils/paintbox";
 
 type SavedColor = {
   id: string;
@@ -8,11 +9,6 @@ type SavedColor = {
   oklch: { l: number; c: number; h: number; alpha: number };
 };
 export type PaintboxSortMode = "newest" | "oldest" | "hue" | "lightness" | "chroma";
-
-const colorKey = (css: string): string => {
-  const parsed = colordx(css);
-  return parsed.isValid() ? parsed.toHex8() : css;
-};
 
 export class PaintboxStore {
   #colors = $state<SavedColor[]>([]);
@@ -70,7 +66,7 @@ export class PaintboxStore {
     } catch (e) {
       console.error("Failed to save paintbox data:", e);
       if (e instanceof Error && e.name === "QuotaExceededError" && colors.length > 0) {
-        const trimmed = colors.slice(Math.ceil(colors.length / 2));
+        const trimmed = newestHalf(colors);
         try {
           localStorage.setItem(PAINTBOX.STORAGE_KEY, JSON.stringify(trimmed));
         } catch {
@@ -120,9 +116,9 @@ export class PaintboxStore {
     if (!this.#initialized) this.init();
 
     const parsed = colordx(css);
-    const key = parsed.isValid() ? parsed.toHex8() : css;
+    const key = toColorKey(css);
 
-    const existingIndex = this.#colors.findIndex((c) => colorKey(c.css) === key);
+    const existingIndex = this.#colors.findIndex((c) => toColorKey(c.css) === key);
     if (existingIndex !== -1) {
       this.#colors.splice(existingIndex, 1);
     }
