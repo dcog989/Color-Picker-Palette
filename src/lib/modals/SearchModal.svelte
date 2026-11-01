@@ -2,6 +2,7 @@
 import { quadOut } from "svelte/easing";
 import { fade, scale } from "svelte/transition";
 import ColorLibrary from "../components/ColorLibrary.svelte";
+import { trapFocus } from "../utils/focus-trap";
 
 interface Props {
   onClose: () => void;
@@ -21,6 +22,9 @@ let { onClose }: Props = $props();
   <div
     class="modal-panel relative flex h-[80vh] w-full max-w-4xl flex-col"
     role="dialog"
+    aria-modal="true"
+    aria-label="Color library"
+    use:trapFocus
     transition:scale={{ duration: 300, easing: quadOut, start: 0.95 }}
   >
     <header class="z-10 mb-4 flex shrink-0 items-center justify-between">

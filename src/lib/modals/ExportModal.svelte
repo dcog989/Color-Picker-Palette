@@ -2,6 +2,7 @@
 import { quadOut } from "svelte/easing";
 import { fade, scale } from "svelte/transition";
 import { getApp } from "../context";
+import { trapFocus } from "../utils/focus-trap";
 import type { ExportFormat } from "../utils/formatters";
 import { exportCode, exportCodeFile, strategies } from "../utils/strategies";
 
@@ -33,6 +34,9 @@ const exports = $derived.by(() =>
   <div
     class="modal-panel relative max-h-[90vh] w-full max-w-3xl space-y-6 overflow-y-auto md:space-y-8"
     role="dialog"
+    aria-modal="true"
+    aria-labelledby="export-modal-title"
+    use:trapFocus
     transition:scale={{ duration: 300, easing: quadOut, start: 0.95 }}
   >
     <header
@@ -41,7 +45,7 @@ const exports = $derived.by(() =>
               pb-4
             "
     >
-      <h2 class="modal-title">Export Code</h2>
+      <h2 class="modal-title" id="export-modal-title">Export Code</h2>
       <div
         class="
                   flex items-center gap-2

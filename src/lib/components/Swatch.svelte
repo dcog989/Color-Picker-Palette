@@ -9,11 +9,10 @@ const { color, paintbox, toast } = getApp();
 interface Props {
   color: string;
   index: number;
-  onSelect?: () => void;
   dynamicClass?: boolean;
 }
 
-let { color: swatchColor, index, onSelect, dynamicClass = true }: Props = $props();
+let { color: swatchColor, index, dynamicClass = true }: Props = $props();
 
 const copy = async (e: MouseEvent) => {
   const formatted = color.formatColor(swatchColor);
@@ -22,13 +21,6 @@ const copy = async (e: MouseEvent) => {
     toast.showAt("Copied", e);
   } catch {
     toast.showAt("Copy failed", e);
-  }
-};
-
-const handleKeyDown = (e: KeyboardEvent) => {
-  if (e.key === "Enter" || e.key === " ") {
-    e.preventDefault();
-    color.set(swatchColor);
   }
 };
 
@@ -41,32 +33,34 @@ const getActionClass = () => {
 </script>
 
 <div
-  role="button"
-  tabindex="0"
   class="
-      group relative aspect-square cursor-pointer overflow-hidden rounded-lg
+      group relative aspect-square overflow-hidden rounded-lg
       border border-white/10 shadow-md
       [background:var(--swatch-color)]
       hover:scale-105
     "
   style:--swatch-color={swatchColor}
-  title={color.formatColor(swatchColor)}
-  onclick={() => (onSelect ? onSelect() : color.set(swatchColor))}
-  onkeydown={handleKeyDown}
-  aria-label="Select swatch {index + 1}"
 >
+  <button
+    type="button"
+    class="absolute inset-0 cursor-pointer"
+    title={color.formatColor(swatchColor)}
+    onclick={() => color.set(swatchColor)}
+    aria-label="Select swatch {index + 1}"
+  ></button>
   <div
     class="
-          absolute inset-0 flex items-center justify-center
+          pointer-events-none absolute inset-0 flex items-center justify-center
           overflow-hidden
         "
   >
     <div
       class="
-              flex items-center justify-center gap-2
+              pointer-events-auto flex items-center justify-center gap-2
               translate-y-8 opacity-0
               transition-all duration-300
               group-hover:translate-y-0 group-hover:opacity-100
+              group-focus-within:translate-y-0 group-focus-within:opacity-100
             "
     >
       <button

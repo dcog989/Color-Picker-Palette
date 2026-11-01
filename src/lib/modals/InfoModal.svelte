@@ -1,6 +1,7 @@
 <script lang="ts">
 import { quadOut } from "svelte/easing";
 import { fade, scale } from "svelte/transition";
+import { trapFocus } from "../utils/focus-trap";
 
 interface Props {
   title: string;
@@ -22,10 +23,13 @@ let { title, content, onClose }: Props = $props();
   <div
     class="modal-panel relative flex max-h-[80vh] w-full max-w-2xl flex-col"
     role="dialog"
+    aria-modal="true"
+    aria-labelledby="info-modal-title"
+    use:trapFocus
     transition:scale={{ duration: 300, easing: quadOut, start: 0.95 }}
   >
     <header class="mb-6 flex shrink-0 items-center justify-between">
-      <h2 class="modal-title">
+      <h2 class="modal-title" id="info-modal-title">
         {title}
       </h2>
       <button type="button" onclick={onClose} class="modal-close" aria-label="Close">×</button>
