@@ -1,10 +1,13 @@
 <script lang="ts">
-import { colordx } from "@colordx/core";
+import { colordx, extend } from "@colordx/core";
+import a11y from "@colordx/core/plugins/a11y";
 import ArrowRightLeft from "@lucide/svelte/icons/arrow-right-left";
 import Check from "@lucide/svelte/icons/check";
 import X from "@lucide/svelte/icons/x";
 import { getApp } from "../context";
 import { safeColor } from "../utils/formatters";
+
+extend([a11y]);
 
 const { color } = getApp();
 

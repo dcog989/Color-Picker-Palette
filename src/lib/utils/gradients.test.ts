@@ -1,9 +1,5 @@
-import { extend } from "@colordx/core";
-import okhsl from "@colordx/core/plugins/okhsl";
 import { describe, expect, it } from "vitest";
 import { getGradient, okhslGradient } from "./gradients";
-
-extend([okhsl]);
 
 describe("getGradient", () => {
   it("maps oklch channels to gradient classes", () => {

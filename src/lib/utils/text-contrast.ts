@@ -1,4 +1,7 @@
-import { colordx } from "@colordx/core";
+import { colordx, extend } from "@colordx/core";
+import a11y from "@colordx/core/plugins/a11y";
+
+extend([a11y]);
 
 export function usesDarkText(background: string): boolean {
   try {

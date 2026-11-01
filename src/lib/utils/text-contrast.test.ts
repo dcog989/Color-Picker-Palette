@@ -1,9 +1,5 @@
-import { extend } from "@colordx/core";
-import a11y from "@colordx/core/plugins/a11y";
 import { describe, expect, it } from "vitest";
 import { usesDarkText } from "./text-contrast";
-
-extend([a11y]);
 
 describe("usesDarkText", () => {
   it("asks for dark text on light backgrounds and light text on dark", () => {
