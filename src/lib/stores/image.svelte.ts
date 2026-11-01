@@ -20,7 +20,7 @@ export class ImageStore {
 
   analysisError = $state<string | null>(null);
 
-  #managedWorker = new ManagedWorker<ImageWorkerMessage>({ maxRetries: 3, retryDelay: 1000 });
+  #managedWorker = new ManagedWorker<ImageWorkerMessage>();
   #generation = 0;
 
   extractedPalette = $derived.by(() => {
