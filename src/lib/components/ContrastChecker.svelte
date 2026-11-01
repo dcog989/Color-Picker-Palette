@@ -22,11 +22,9 @@ let inverted = $state<Record<ContrastMode, boolean>>({
   custom: true,
 });
 
-const isValidColor = (colorStr: string): boolean => {
-  return safeColor(colorStr) !== null;
-};
+const parsedCustom = $derived(safeColor(customColor));
 
-let customColorError = $derived(mode === "custom" && !isValidColor(customColor));
+let customColorError = $derived(mode === "custom" && !parsedCustom);
 
 const getTargetColor = (m: ContrastMode): string => {
   switch (m) {
@@ -35,7 +33,7 @@ const getTargetColor = (m: ContrastMode): string => {
     case "black":
       return "#000000";
     case "custom":
-      return isValidColor(customColor) ? customColor : "#888888";
+      return parsedCustom?.toHex() ?? "#888888";
   }
 };
 
@@ -50,7 +48,7 @@ const toggleInvert = (m: ContrastMode) => {
 };
 
 const apcaFor = (m: ContrastMode): number => {
-  if (m === "custom" && !isValidColor(customColor)) return 0;
+  if (m === "custom" && customColorError) return 0;
   const target = getTargetColor(m);
   const foreground = inverted[m] ? target : color.hex;
   const background = inverted[m] ? color.hex : target;
@@ -64,7 +62,7 @@ const apcaFor = (m: ContrastMode): number => {
 let currentApca = $derived(apcaFor(mode));
 
 let currentWcag = $derived.by((): number => {
-  if (mode === "custom" && !isValidColor(customColor)) return 0;
+  if (mode === "custom" && customColorError) return 0;
   try {
     const ratio = colordx(fg).contrast(bg);
     return !Number.isNaN(ratio) && Number.isFinite(ratio) ? ratio : 0;
@@ -74,7 +72,7 @@ let currentWcag = $derived.by((): number => {
 });
 
 const readableAt = (level: WcagLevel): boolean => {
-  if (mode === "custom" && !isValidColor(customColor)) return false;
+  if (mode === "custom" && customColorError) return false;
   try {
     const parsed = colordx(fg);
     switch (level) {
@@ -113,7 +111,7 @@ const getApcaRating = (score: number) => {
         >
           <span class="section-heading">{m}</span>
           <div class="flex items-baseline gap-1">
-            {#if m === "custom" && !isValidColor(customColor)}
+            {#if m === "custom" && customColorError}
               <span class="text-lg font-black text-red-500">--</span>
               <span class="font-mono text-xs text-red-500/70">!</span>
             {:else}
@@ -170,7 +168,7 @@ const getApcaRating = (score: number) => {
                     absolute top-1/2 left-3 size-5 -translate-y-1/2
                     rounded-full border border-(--ui-border)
                   "
-        style:background-color={customColorError ? "transparent" : customColor}
+        style:background-color={customColorError ? "transparent" : parsedCustom?.toHex()}
       >
         {#if customColorError}
           <span class="absolute inset-0 flex items-center justify-center text-xs font-bold text-red-500">!</span>
