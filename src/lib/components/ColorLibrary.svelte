@@ -146,134 +146,115 @@ let offsetY = $derived(startIndex * itemHeight);
 
 interface Props {
   onSelect?: () => void;
-  forceExpanded?: boolean;
 }
 
-let { onSelect, forceExpanded = false }: Props = $props();
+let { onSelect }: Props = $props();
 
 function selectColor(hex: string) {
   colorStore.set(hex);
   onSelect?.();
 }
 
-let isExpanded = $state(false);
-let shouldShowContent = $derived(forceExpanded || isExpanded);
-
 $effect(() => {
-  if (shouldShowContent && searchInput) {
+  if (searchInput) {
     searchInput.focus();
   }
 });
 </script>
 
 <div class="flex h-full flex-col">
-  {#if !forceExpanded}
-    <div class="mb-4 flex items-center justify-between">
-      <h3 class="section-heading">Color Library</h3>
-      <button
-        type="button"
-        onclick={() => (isExpanded = !isExpanded)}
-        class="sub-label opacity-40 transition-opacity hover:opacity-100"
-      >
-        {isExpanded ? "Collapse" : "Expand"}
-      </button>
-    </div>
-  {/if}
-
-  {#if shouldShowContent}
-    <div
-      class="
-              flex flex-1 flex-col overflow-hidden rounded-xl border
-              border-(--ui-border) bg-(--ui-bg) p-4
-              md:p-6
-            "
+  <div
+    class="
+            flex flex-1 flex-col overflow-hidden rounded-xl border
+            border-(--ui-border) bg-(--ui-bg) p-4
+            md:p-6
+          "
+  >
+    <input
+      id="searchInput"
+      bind:this={searchInput}
+      type="text"
+      bind:value={searchQuery}
+      placeholder="Search 30,000+ colors..."
+      class="text-input mb-4 shrink-0 bg-(--ui-card) p-4 text-sm shadow-inner"
     >
-      <input
-        id="searchInput"
-        bind:this={searchInput}
-        type="text"
-        bind:value={searchQuery}
-        placeholder="Search 30,000+ colors..."
-        class="text-input mb-4 shrink-0 bg-(--ui-card) p-4 text-sm shadow-inner"
-      >
 
-      {#if isLoading}
-        <LoadingSpinner message="Loading color library..." subtitle="30,000+ colors" />
-      {:else if isFiltering}
-        <LoadingSpinner message="Searching..." />
-      {:else if loadError}
-        <div class="flex flex-1 items-center justify-center">
-          <div class="text-center text-red-500">
-            <CircleAlert class="mx-auto mb-4 size-12" />
-            <div class="text-sm">{loadError}</div>
-          </div>
+    {#if isLoading}
+      <LoadingSpinner message="Loading color library..." subtitle="30,000+ colors" />
+    {:else if isFiltering}
+      <LoadingSpinner message="Searching..." />
+    {:else if loadError}
+      <div class="flex flex-1 items-center justify-center">
+        <div class="text-center text-red-500">
+          <CircleAlert class="mx-auto mb-4 size-12" />
+          <div class="text-sm">{loadError}</div>
         </div>
-      {:else}
-        <div
-          class="relative flex-1 overflow-y-auto"
-          onscroll={handleScroll}
-          bind:clientHeight={viewportHeight}
-          bind:this={scrollEl}
-        >
-          {#if filteredColors.length > 0}
-            <div style:height="{totalHeight}px" class="pointer-events-none absolute top-0 left-0 w-full"></div>
+      </div>
+    {:else}
+      <div
+        class="relative flex-1 overflow-y-auto"
+        onscroll={handleScroll}
+        bind:clientHeight={viewportHeight}
+        bind:this={scrollEl}
+      >
+        {#if filteredColors.length > 0}
+          <div style:height="{totalHeight}px" class="pointer-events-none absolute top-0 left-0 w-full"></div>
 
-            <div style:transform="translateY({offsetY}px)" class="absolute top-0 left-0 w-full px-1">
-              {#each visibleItems as color (color.hex + color.name)}
-                <button
-                  type="button"
-                  onclick={() => selectColor(color.hex)}
-                  class="
+          <div style:transform="translateY({offsetY}px)" class="absolute top-0 left-0 w-full px-1">
+            {#each visibleItems as color (color.hex + color.name)}
+              <button
+                type="button"
+                onclick={() => selectColor(color.hex)}
+                class="
                                       group mb-1 box-border flex h-14 w-full
                                       items-center gap-4 rounded-md p-2
                                       text-left transition-colors
                                       hover:bg-(--ui-card)
                                     "
-                >
-                  <div
-                    class="
+              >
+                <div
+                  class="
                                           size-10 shrink-0 rounded-sm border
                                           border-white/10 shadow-sm
                                           transition-transform
                                           [background:var(--item-bg)]
                                           group-hover:scale-110
                                         "
-                    style:--item-bg={color.hex}
-                    title={colorStore.formatColor(color.hex)}
-                  ></div>
-                  <div class="min-w-0 flex-1">
-                    <div
-                      class="
+                  style:--item-bg={color.hex}
+                  title={colorStore.formatColor(color.hex)}
+                ></div>
+                <div class="min-w-0 flex-1">
+                  <div
+                    class="
                                               truncate text-sm font-bold
                                               text-(--ui-text)
                                             "
-                    >
-                      {color.name}
-                    </div>
-                    <div
-                      class="
+                  >
+                    {color.name}
+                  </div>
+                  <div
+                    class="
                                               font-mono text-xs tracking-wider
                                               uppercase opacity-70
                                             "
-                    >
-                      {color.hex}
-                    </div>
+                  >
+                    {color.hex}
                   </div>
-                </button>
-              {/each}
-            </div>
-          {:else}
-            <div
-              class="
+                </div>
+              </button>
+            {/each}
+          </div>
+        {:else}
+          <div
+            class="
                               flex h-full items-center justify-center text-sm
                               opacity-60
                             "
-            >
-              No colors found
-            </div>
-          {/if}
-        </div>
-      {/if}
-    </div>
-  {/if}
+          >
+            No colors found
+          </div>
+        {/if}
+      </div>
+    {/if}
+  </div>
 </div>

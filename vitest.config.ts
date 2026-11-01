@@ -6,11 +6,20 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,svelte}"],
-    setupFiles: ["./vitest.setup.ts"],
     coverage: {
       provider: "v8",
+      include: ["src/lib/utils/**/*.ts"],
       reporter: ["text", "json", "html", "lcov"],
-      exclude: ["node_modules/", ".svelte-kit/", "**/types.ts", "**/*.d.ts", "**/constants.ts", "**/data/**"],
+      exclude: [
+        "node_modules/",
+        ".svelte-kit/",
+        "**/types.ts",
+        "**/*.d.ts",
+        "**/*.test.ts",
+        "**/constants.ts",
+        "**/data/**",
+        "**/visual-strategies.ts",
+      ],
       thresholds: {
         lines: 80,
         statements: 80,

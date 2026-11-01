@@ -328,11 +328,6 @@ export class ColorStore {
     return `oklch(${oklch.l * 100}% ${oklch.c} ${oklch.h}${alphaStr})`;
   });
 
-  cssVarOpaque = $derived.by(() => {
-    const oklch = this.#oklch;
-    return `oklch(${oklch.l * 100}% ${oklch.c} ${oklch.h})`;
-  });
-
   randomize() {
     this.#setCurrent(ColorStore.#getRandomColor());
   }

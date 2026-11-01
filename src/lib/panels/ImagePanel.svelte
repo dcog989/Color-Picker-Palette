@@ -2,7 +2,6 @@
 import Image from "@lucide/svelte/icons/image";
 import LayersPlus from "@lucide/svelte/icons/layers-plus";
 import X from "@lucide/svelte/icons/x";
-import { onDestroy } from "svelte";
 import Swatch from "../components/Swatch.svelte";
 import { IMAGE_ANALYSIS } from "../constants";
 import { getApp } from "../context";
@@ -68,10 +67,6 @@ const sortOptions: { label: string; value: SortMode }[] = [
   { label: "Bright", value: "bright" },
   { label: "Dark", value: "dark" },
 ];
-
-onDestroy(() => {
-  imageAnalyzer.destroy();
-});
 </script>
 
 <section

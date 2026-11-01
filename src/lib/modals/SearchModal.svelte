@@ -32,7 +32,7 @@ let { onClose }: Props = $props();
       <button type="button" onclick={onClose} class="modal-close" aria-label="Close">×</button>
     </header>
     <div class="relative min-h-0 flex-1">
-      <ColorLibrary onSelect={onClose} forceExpanded={true} />
+      <ColorLibrary onSelect={onClose} />
     </div>
   </div>
 </div>

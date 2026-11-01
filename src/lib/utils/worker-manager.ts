@@ -18,10 +18,6 @@ export class ManagedWorker<TMessage = unknown> {
     this.#retryDefaultDelay = config?.retryDelay ?? 1000;
   }
 
-  get isActive(): boolean {
-    return this.#worker !== null;
-  }
-
   init(
     factory: () => Worker,
     handlers: {
