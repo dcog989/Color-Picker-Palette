@@ -15,6 +15,7 @@ let totalColors = $state(0);
 let isLoading = $state(true);
 let isFiltering = $state(false);
 let loadError = $state<string | null>(null);
+let scrollEl = $state<HTMLDivElement | null>(null);
 
 let unsubscribe: (() => void) | null = null;
 let searchDebounceTimeout: number | null = null;
@@ -81,6 +82,7 @@ $effect(() => {
     debouncedQuery = "";
   }
 
+  scrollEl?.scrollTo({ top: 0 });
   _scrollTop = 0;
   throttledScrollTop = 0;
 });
@@ -103,7 +105,8 @@ let filteredColors = $derived.by((): Array<{ name: string; hex: string }> => {
 let _scrollTop = $state(0);
 let throttledScrollTop = $state(0);
 let viewportHeight = $state(400);
-const itemHeight = 56;
+// Must match the row box: h-14 (56px) + mb-1 (4px).
+const itemHeight = 60;
 const buffer = 5;
 let scrollThrottleTimeout: number | null = null;
 
@@ -206,7 +209,12 @@ $effect(() => {
           </div>
         </div>
       {:else}
-        <div class="relative flex-1 overflow-y-auto" onscroll={handleScroll} bind:clientHeight={viewportHeight}>
+        <div
+          class="relative flex-1 overflow-y-auto"
+          onscroll={handleScroll}
+          bind:clientHeight={viewportHeight}
+          bind:this={scrollEl}
+        >
           {#if filteredColors.length > 0}
             <div style:height="{totalHeight}px" class="pointer-events-none absolute top-0 left-0 w-full"></div>
 
