@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v3.9.5 - 2026-11-05
+
+#### Bug Fixes
+
+- (9a58a2b) label WCAG metric card "WCAG" instead of "Ratio" - dcog989
+
+#### Miscellaneous Chores
+
+- (60adfbb) package updates - dcog989
+- - -
+
 ## v3.9.4 - 2026-11-01
 
 #### Bug Fixes
